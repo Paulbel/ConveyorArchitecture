@@ -6,28 +6,43 @@ function parseToMassif() {
     var divisor = document.getElementById("divisorTextField").value.split("");
     invertMassifOfSixNumbers(divident);
     invertMassifOfSixNumbers(divisor);
-    putInRegisters(divident, divisor);
+    putInRegisters([1,1,1,1,0,0], [1,0,1,0,0,0]);
 }
 
 function putInRegisters(divident, divisor) {
-    var registerP = [0, 0, 0, 0, 0, 0, 0];
+    var registerP = [0, 0, 0, 0, 0, 0];
     var registerA = [];
     var registerB = [];
     for (var index = 0; index < 6; index++) {
         registerA.push(+divident[index]);
         registerB.push(+divisor[index]);
     }
-    shift(registerA, registerP);
-/*    registerP = subtract(registerP, registerB);
-    if(registerP[6]==1){
-        registerP = summ(registerP, registerB);
-    }*/
-    console.log(registerP);
+    for(var index = 0; index < 6; index++){
+
+        shift(registerA, registerP);
+        var registerPCopy = registerP.slice();
+        registerP = subtract(registerP, registerB);
+        if(registerP.length>6){
+            setLowOrderBitOfRegister(registerA, 0);
+            registerP = restoreRegister(registerPCopy);
+        }
+        else{
+            setLowOrderBitOfRegister(registerA, 1);
+            console.log("register a with 1:" + registerA);
+        }
+    }
     console.log(registerA);
-    console.log(registerB);
+    console.log(registerP);
 }
 
 
+function setLowOrderBitOfRegister(registerA , lastBit) {
+     registerA[0] = lastBit;
+}
+
+function restoreRegister(oldRegister) {
+    return oldRegister;
+}
 function invertMassifOfSixNumbers(massif) {
     for (var index = 0; index < 3; index++) {
         var tempVarForElemsChanging;
@@ -53,14 +68,14 @@ function subtract(minuend, subtrahend) {
     negative = new Boolean(false);
     if (comperisonIfSecondBigger(minuend, subtrahend)) {
         biggerNumber = subtrahend;
-        smallerNumber = minuend;
-        negative = true;
-    }
-    else {
-        biggerNumber = minuend;
-        smallerNumber = subtrahend;
-    }
-    var addition = smallerNumber.slice();
+    smallerNumber = minuend;
+    negative = true;
+}
+else {
+    biggerNumber = minuend;
+    smallerNumber = subtrahend;
+}
+var addition = smallerNumber.slice();
     for (var index = 0; index < smallerNumber.length; index++) {
         if (addition[index] == 1) {
             addition[index] = 0;
@@ -74,15 +89,10 @@ function subtract(minuend, subtrahend) {
     if (substraction.length > 6) {
         substraction.pop();
     }
-    if (negative) {
+    if (negative==true){
         substraction.push(1);
     }
-    else {
-        substraction.push(0);
-    }
-    //console.log(substraction);
     return substraction;
-
 }
 
 function comperisonIfSecondBigger(fisrtBinNumber, secondBinNumber) {
@@ -94,11 +104,21 @@ function comperisonIfSecondBigger(fisrtBinNumber, secondBinNumber) {
     return false;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function summ(P, B) {
-    if(P[6]==1){
-        P[6]=0;
-        return subtract(B,P);
-    }
     var summOfPair = [];
     for (var index = 0; index < 6; index++) {
         summOfPair[index] = P[index] + B[index];
